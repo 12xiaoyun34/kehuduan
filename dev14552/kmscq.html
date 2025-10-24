@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡密生成器</title>
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f5f7ff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-color: #dee2e6;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background-color: #3a5bef;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .result-area {
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .card-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card-item:last-child {
+            border-bottom: none;
+        }
+        
+        .card-code {
+            font-family: monospace;
+            font-weight: bold;
+        }
+        
+        .card-status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-valid {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-used {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>卡密生成器</h1>
+            <p>安全、高效地生成和管理卡密</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="generate">生成卡密</div>
+            <div class="tab" data-tab="verify">验证卡密</div>
+            <div class="tab" data-tab="manage">管理卡密</div>
+        </div>
+        
+        <div class="tab-content active" id="generate-tab">
+            <div class="grid">
+                <div class="card">
+                    <h2 class="card-title">生成设置</h2>
+                    <div class="form-group">
+                        <label for="card-count">生成数量</label>
+                        <input type="number" id="card-count" min="1" max="1000" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="card-length">卡密长度</label>
+                        <input type="number" id="card-length" min="8" max="32" value="16">
+                    </div>
+                    <div class="form-group">
+                        <label for="card-prefix">前缀 (可选)</label>
+                        <input type="text" id="card-prefix" maxlength="5" placeholder="例如: VIP">
+                    </div>
+                    <div class="form-group">
+                        <label for="card-format">格式</label>
+                        <select id="card-format">
+                            <option value="alphanumeric">字母数字混合</option>
+                            <option value="numeric">纯数字</option>
+                            <option value="alphabetic">纯字母</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-segments">分段数量</label>
+                        <select id="card-segments">
+                            <option value="1">不分段</option>
+                            <option value="2" selected>2段</option>
+                            <option value="3">3段</option>
+                            <option value="4">4段</option>
+                        </select>
+                    </div>
+                    <button id="generate-btn">生成卡密</button>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">生成结果</h2>
+                    <div class="result-area" id="result-area">
+                        生成的卡密将显示在这里...
+                    </div>
+                    <div class="action-buttons">
+                        <button id="copy-btn" class="btn-secondary">复制到剪贴板</button>
+                        <button id="export-btn" class="btn-success">导出为文本文件</button>
+                        <button id="clear-btn" class="btn-danger">清空结果</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="verify-tab">
+            <div class="grid">
+                <div class="card">
+                    <h2 class="card-title">验证卡密</h2>
+                    <div class="form-group">
+                        <label for="verify-code">输入卡密</label>
+                        <input type="text" id="verify-code" placeholder="请输入要验证的卡密">
+                    </div>
+                    <button id="verify-btn">验证卡密</button>
+                    <div id="verify-result" class="result-area" style="margin-top: 15px; min-height: 100px;">
+                        验证结果将显示在这里...
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">卡密状态说明</h2>
+                    <p><strong>有效卡密：</strong>未被使用且格式正确的卡密</p>
+                    <p><strong>已使用：</strong>已被使用过的卡密</p>
+                    <p><strong>无效卡密：</strong>格式错误或不存在于系统中的卡密</p>
+                    <p><strong>过期卡密：</strong>已超过有效期的卡密</p>
+                    
+                    <h3 style="margin-top: 20px;">批量验证</h3>
+                    <div class="form-group">
+                        <label for="batch-verify">输入多个卡密 (每行一个)</label>
+                        <textarea id="batch-verify" rows="5" placeholder="每行输入一个卡密"></textarea>
+                    </div>
+                    <button id="batch-verify-btn" class="btn-secondary">批量验证</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="manage-tab">
+            <div class="card">
+                <h2 class="card-title">卡密管理</h2>
+                <div class="action-buttons">
+                    <button id="load-cards-btn">加载卡密</button>
+                    <button id="clear-all-btn" class="btn-danger">清空所有卡密</button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="search-card">搜索卡密</label>
+                    <input type="text" id="search-card" placeholder="输入卡密或部分内容进行搜索">
+                </div>
+                
+                <ul class="card-list" id="card-list">
+                    <!-- 卡密列表将动态生成在这里 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // 全局变量
+        let generatedCards = [];
+        let storedCards = JSON.parse(localStorage.getItem('cardManager_cards')) || [];
+        
+        // DOM 元素
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const generateBtn = document.getElementById('generate-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const verifyBtn = document.getElementById('verify-btn');
+        const batchVerifyBtn = document.getElementById('batch-verify-btn');
+        const loadCardsBtn = document.getElementById('load-cards-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const searchCardInput = document.getElementById('search-card');
+        const resultArea = document.getElementById('result-area');
+        const verifyResult = document.getElementById('verify-result');
+        const cardList = document.getElementById('card-list');
+        const notification = document.getElementById('notification');
+        
+        // 标签页切换
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // 更新活动标签
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 显示对应内容
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // 如果是管理标签，刷新卡密列表
+                if (tabId === 'manage') {
+                    renderCardList();
+                }
+            });
+        });
+        
+        // 生成卡密
+        generateBtn.addEventListener('click', generateCards);
+        
+        function generateCards() {
+            const count = parseInt(document.getElementById('card-count').value);
+            const length = parseInt(document.getElementById('card-length').value);
+            const prefix = document.getElementById('card-prefix').value;
+            const format = document.getElementById('card-format').value;
+            const segments = parseInt(document.getElementById('card-segments').value);
+            
+            if (count < 1 || count > 1000) {
+                showNotification('生成数量必须在1-1000之间', 'error');
+                return;
+            }
+            
+            if (length < 8 || length > 32) {
+                showNotification('卡密长度必须在8-32之间', 'error');
+                return;
+            }
+            
+            generatedCards = [];
+            let resultText = '';
+            
+            for (let i = 0; i < count; i++) {
+                let card = generateCard(length, format, prefix, segments);
+                generatedCards.push(card);
+                resultText += card + '\n';
+                
+                // 同时保存到本地存储
+                storedCards.push({
+                    code: card,
+                    status: 'valid',
+                    generatedAt: new Date().toISOString(),
+                    usedAt: null
+                });
+            }
+            
+            // 更新本地存储
+            localStorage.setItem('cardManager_cards', JSON.stringify(storedCards));
+            
+            resultArea.textContent = resultText;
+            showNotification(`成功生成 ${count} 个卡密`, 'success');
+        }
+        
+        function generateCard(length, format, prefix, segments) {
+            let charset = '';
+            
+            switch (format) {
+                case 'numeric':
+                    charset = '0123456789';
+                    break;
+                case 'alphabetic':
+                    charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    break;
+                case 'alphanumeric':
+                default:
+                    charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                    break;
+            }
+            
+            let card = '';
+            const segmentLength = Math.floor(length / segments);
+            const remainder = length % segments;
+            
+            // 生成卡密主体
+            for (let i = 0; i < length; i++) {
+                card += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            
+            // 添加前缀
+            if (prefix) {
+                card = prefix + card.substring(prefix.length);
+            }
+            
+            // 分段处理
+            if (segments > 1) {
+                let segmentedCard = '';
+                let currentIndex = 0;
+                
+                for (let i = 0; i < segments; i++) {
+                    let currentSegmentLength = segmentLength;
+                    if (i === segments - 1) {
+                        currentSegmentLength += remainder;
+                    }
+                    
+                    if (i > 0) {
+                        segmentedCard += '-';
+                    }
+                    segmentedCard += card.substring(currentIndex, currentIndex + currentSegmentLength);
+                    currentIndex += currentSegmentLength;
+                }
+                
+                card = segmentedCard;
+            }
+            
+            return card;
+        }
+        
+        // 复制到剪贴板
+        copyBtn.addEventListener('click', () => {
+            if (generatedCards.length === 0) {
+                showNotification('没有可复制的卡密', 'error');
+                return;
+            }
+            
+            const textToCopy = generatedCards.join('\n');
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showNotification('卡密已复制到剪贴板', 'success');
+                })
+                .catch(err => {
+                    console.error('复制失败: ', err);
+                    showNotification('复制失败，请手动选择并复制', 'error');
+                });
+        });
+        
+        // 导出为文本文件
+        exportBtn.addEventListener('click', () => {
+            if (generatedCards.length === 0) {
+                showNotification('没有可导出的卡密', 'error');
+                return;
+            }
+            
+            const textToExport = generatedCards.join('\n');
+            const blob = new Blob([textToExport], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `卡密_${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('卡密已导出为文本文件', 'success');
+        });
+        
+        // 清空结果
+        clearBtn.addEventListener('click', () => {
+            generatedCards = [];
+            resultArea.textContent = '生成的卡密将显示在这里...';
+            showNotification('已清空生成结果', 'success');
+        });
+        
+        // 验证单个卡密
+        verifyBtn.addEventListener('click', () => {
+            const code = document.getElementById('verify-code').value.trim();
+            if (!code) {
+                showNotification('请输入要验证的卡密', 'error');
+                return;
+            }
+            
+            const result = verifyCard(code);
+            let resultHtml = '';
+            
+            if (result.valid) {
+                resultHtml = `<div style="color: green; font-weight: bold;">✓ 卡密有效</div>`;
+                if (result.status === 'used') {
+                    resultHtml += `<div>状态: <span class="card-status status-used">已使用</span></div>`;
+                    resultHtml += `<div>使用时间: ${result.usedAt ? new Date(result.usedAt).toLocaleString() : '未知'}</div>`;
+                } else {
+                    resultHtml += `<div>状态: <span class="card-status status-valid">未使用</span></div>`;
+                    resultHtml += `<div>生成时间: ${result.generatedAt ? new Date(result.generatedAt).toLocaleString() : '未知'}</div>`;
+                }
+            } else {
+                resultHtml = `<div style="color: red; font-weight: bold;">✗ 卡密无效</div>`;
+                resultHtml += `<div>原因: ${result.reason}</div>`;
+            }
+            
+            verifyResult.innerHTML = resultHtml;
+        });
+        
+        // 批量验证
+        batchVerifyBtn.addEventListener('click', () => {
+            const codesText = document.getElementById('batch-verify').value.trim();
+            if (!codesText) {
+                showNotification('请输入要验证的卡密', 'error');
+                return;
+            }
+            
+            const codes = codesText.split('\n').map(code => code.trim()).filter(code => code);
+            let resultHtml = '<div style="margin-bottom: 10px;">批量验证结果:</div>';
+            let validCount = 0;
+            
+            codes.forEach(code => {
+                const result = verifyCard(code);
+                if (result.valid) {
+                    resultHtml += `<div style="color: green;">✓ ${code} - 有效</div>`;
+                    validCount++;
+                } else {
+                    resultHtml += `<div style="color: red;">✗ ${code} - 无效 (${result.reason})</div>`;
+                }
+            });
+            
+            resultHtml += `<div style="margin-top: 10px; font-weight: bold;">总计: ${codes.length} 个卡密, 有效: ${validCount} 个, 无效: ${codes.length - validCount} 个</div>`;
+            
+            verifyResult.innerHTML = resultHtml;
+        });
+        
+        function verifyCard(code) {
+            // 查找卡密
+            const card = storedCards.find(c => c.code === code);
+            
+            if (!card) {
+                return {
+                    valid: false,
+                    reason: '卡密不存在'
+                };
+            }
+            
+            return {
+                valid: true,
+                status: card.status,
+                generatedAt: card.generatedAt,
+                usedAt: card.usedAt
+            };
+        }
+        
+        // 加载卡密
+        loadCardsBtn.addEventListener('click', renderCardList);
+        
+        // 清空所有卡密
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有卡密吗？此操作不可恢复！')) {
+                storedCards = [];
+                localStorage.setItem('cardManager_cards', JSON.stringify(storedCards));
+                renderCardList();
+                showNotification('已清空所有卡密', 'success');
+            }
+        });
+        
+        // 搜索卡密
+        searchCardInput.addEventListener('input', () => {
+            renderCardList(searchCardInput.value);
+        });
+        
+        // 渲染卡密列表
+        function renderCardList(filter = '') {
+            cardList.innerHTML = '';
+            
+            let filteredCards = storedCards;
+            if (filter) {
+                filteredCards = storedCards.filter(card => 
+                    card.code.toLowerCase().includes(filter.toLowerCase())
+                );
+            }
+            
+            if (filteredCards.length === 0) {
+                cardList.innerHTML = '<li class="card-item" style="justify-content: center; color: #6c757d;">暂无卡密数据</li>';
+                return;
+            }
+            
+            filteredCards.forEach(card => {
+                const li = document.createElement('li');
+                li.className = 'card-item';
+                
+                li.innerHTML = `
+                    <div>
+                        <div class="card-code">${card.code}</div>
+                        <div style="font-size: 0.8rem; color: #6c757d;">
+                            生成时间: ${new Date(card.generatedAt).toLocaleString()}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="card-status ${card.status === 'valid' ? 'status-valid' : 'status-used'}">
+                            ${card.status === 'valid' ? '未使用' : '已使用'}
+                        </span>
+                    </div>
+                `;
+                
+                cardList.appendChild(li);
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCardList();
+        });
+    </script>
+</body>
+</html>
