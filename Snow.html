@@ -237,8 +237,8 @@
 <body>
     <div class="container">
         <div class="logo">
-            <h1>ORK Client</h1><br>
-            <img src="./img/ork.jpg" alt="ORK Logo" width="80%">
+            <h1>Snow Client</h1><br>
+            <img src="./img/snow.jpg" alt="ORK Logo" width="80%">
         </div>
         
         <h1>验证卡密</h1>
@@ -250,7 +250,7 @@
             </div>
             <button id="verify-btn">验证卡密</button>
             <div class="buy">
-            <button id="buy-btn"><a href="https://xx.youxi186.com/item/6w9sn7">购买卡密</a></button>
+            <button id="buy-btn"><a href="https://xx.youxi186.com/item/9nrdwx">购买卡密</a></button>
             </div>
             
             <div class="loading" id="loading">
@@ -282,7 +282,7 @@
         // 加载卡密数据
         async function loadCardKeys() {
             try {
-                const response = await fetch('./kami0125/ork.txt');
+                const response = await fetch('./kami0125/snow.txt');
                 if (!response.ok) {
                     throw new Error('无法加载卡密数据文件');
                 }
@@ -369,7 +369,7 @@
         downloadBtn.addEventListener('click', function(e) {
             e.preventDefault();
             alert('前往下载');
-            window.open('https://www.123865.com/s/ym2Bvd-VWbP3')
+            window.open('https://www.123865.com/s/ym2Bvd-hCbP3')
         });
     </script>
 </body>

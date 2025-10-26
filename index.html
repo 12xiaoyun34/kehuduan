@@ -415,9 +415,9 @@
         <!-- 横幅 -->
         <div class="banner">
             <div class="banner-content">
-                <h1>ORKClient 最新推出</h1>
+                <h1>SnowClient 最新推出</h1>
             </div>
-           <img src="./img/ork.jpg" width="200"><br>
+           <img src="./img/snow.jpg" width="200"><br>
            <a href="https://xx.youxi186.com/item/6w9sn7" class="btn">购买卡密</a>
         </div>
 
@@ -427,6 +427,20 @@
         </div>
         <div class="products">
             <!-- 商品1 -->
+            <div class="product-card" onclick="goToProduct2('product2')">
+                <div class="product-image">
+                    <img src="./img/snow.jpg" width="100">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Snow Client</div>
+                    <div class="product-description">PVP & 生存，制作：小云</div>
+                    <div class="product-price">
+                        <div class="price">¥3.2(含手续费)</div>
+                        <button class="add-to-cart">购买卡密/下载</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="product-card" onclick="goToProduct('product1')">
                 <div class="product-image">
                     <img src="./img/ork.jpg" width="100">
@@ -452,7 +466,16 @@
             console.log(`跳转到商品: ${productId}`);
             window.open("./ORK.html")
         }
+
+        function goToProduct2(productId) {
+            // 在实际应用中，这里应该跳转到对应商品的详情页
+            // 例如：window.location.href = `/product/${productId}`;
+            
+            // 此处仅做演示，显示一个提示
+            alert(`正在跳转到 ${productId} 的商品详情页`);
+            console.log(`跳转到商品: ${productId}`);
+            window.open("./Snow.html")
+        }
     </script>
 </body>
-
 </html>
